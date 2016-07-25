@@ -1,0 +1,23 @@
+#!/bin/bash
+
+scripts_path="/home/remote/git-svn-sync"
+logs_path="$scripts_path/logs"
+
+mkdir -p "$logs_path"
+
+repo_path="$(pwd)"
+
+while read oldrev newrev ref
+do
+    if [ "$ref" != "refs/heads/master" ] ; then
+        exit 0;
+    fi
+
+    if [ "$ref" == "refs/heads/master" ] ; then
+        message=$(git log -1 --pretty=%B)
+
+        logfile="$logs_path/$(date +%Y-%m-%d:%H:%M:%S)-$message.log"
+
+        sh "$scripts_path/push.sh" "$repo_path" "$message" | tee -a "$logfile"
+    fi
+done
